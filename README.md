@@ -52,7 +52,9 @@ What the core does, class by class:
 - `Camunda7UserTaskParseListener` attaches `Camunda7UserTaskListener` to every user task, as a
   built-in listener of all four task events.
 - `Camunda7WorkflowHistoryHandler` turns the engine's process-instance history events into the
-  cockpit's workflow events.
+  cockpit's workflow events. An update which suspends or activates an instance becomes a suspension
+  or an activation of every open user task of the instance and of its workflow. The engine calls no
+  task listener for that.
 - `Camunda7CockpitEvents` is what both of them report through. It builds the identifiers and hands
   the event to the cockpit. The cockpit builds the report right away and writes one outbox entry.
 - `Camunda7EventBeingReported` holds what the engine handed over while that report is built. It is
