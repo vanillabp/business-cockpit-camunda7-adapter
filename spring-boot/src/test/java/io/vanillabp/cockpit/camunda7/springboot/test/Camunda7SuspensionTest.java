@@ -8,10 +8,12 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.task.Task;
 import org.junit.jupiter.api.AfterEach;
@@ -367,22 +369,27 @@ public class Camunda7SuspensionTest {
   }
 
   @Test
-  @DisplayName("A batch suspends in the job executor, and every instance is reported without a person")
+  @DisplayName("A batch suspends in the job executor, and every instance is reported with the person who created the batch")
   public void aBatchSuspension() {
 
     final var first = aRunningInstance();
     final var second = aRunningInstance();
 
-    final var batch = engine
-        .getRuntimeService()
-        .updateProcessInstanceSuspensionState()
-        .byProcessInstanceIds(first.id(), second.id())
-        .suspendAsync();
-    runTheJobsOf(batch.getSeedJobDefinitionId());
-    runTheJobsOf(batch.getBatchJobDefinitionId());
+    final var batch = new AtomicReference<Batch>();
+    as(
+        THE_ONE_WHO_SUSPENDS, engine -> batch
+            .set(
+                engine
+                    .getRuntimeService()
+                    .updateProcessInstanceSuspensionState()
+                    .byProcessInstanceIds(first.id(), second.id())
+                    .suspendAsync()));
+    // nobody is signed in while the jobs run, as in the job executor
+    runTheJobsOf(batch.get().getSeedJobDefinitionId());
+    runTheJobsOf(batch.get().getBatchJobDefinitionId());
 
-    awaitReportsOf(first, "suspended", null);
-    awaitReportsOf(second, "suspended", null);
+    awaitReportsOf(first, "suspended", THE_ONE_WHO_SUSPENDS);
+    awaitReportsOf(second, "suspended", THE_ONE_WHO_SUSPENDS);
 
   }
 

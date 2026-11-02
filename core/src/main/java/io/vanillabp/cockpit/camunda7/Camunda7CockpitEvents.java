@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -340,9 +341,7 @@ public class Camunda7CockpitEvents {
     }
 
     final var command = Context.getCommandContext();
-    // the user of the IdentityService on this thread. Nobody is signed in in the job executor,
-    // which runs a timer and an asynchronous batch, and in a REST call without authentication
-    final var suspendedBy = command.getAuthenticatedUserId();
+    final var suspendedBy = whoSuspendedOrActivated(command);
     final var timestamp = atOffset(ClockUtil.getCurrentTime());
 
     final var userTaskKind = kind == WorkflowEventKind.SUSPENDED
@@ -367,6 +366,41 @@ public class Camunda7CockpitEvents {
         .publishWorkflowSuspension(
             reference, kind, suspensionEventIdOf(event.getProcessInstanceId(), kind, timestamp), timestamp,
             suspendedBy, transaction());
+
+  }
+
+  /**
+   * The person who suspended or activated a process instance. That is the user of the
+   * <code>IdentityService</code> on the thread of the command. Nobody is signed in in the job
+   * executor, nor in a REST call without authentication.
+   * <p>
+   * An asynchronous batch runs in the job executor, but the engine keeps the user who created the
+   * batch. That user asked for the suspension, so the report names them. The job of the batch
+   * belongs to a job definition whose configuration is the id of the batch. A timer which suspends
+   * a process definition at a later moment keeps no user, so its report names nobody.
+   *
+   * @return The id of the user, or <code>null</code> where the engine does not know one
+   */
+  private static String whoSuspendedOrActivated(
+      final CommandContext command) {
+
+    final var signedIn = command.getAuthenticatedUserId();
+    if (signedIn != null) {
+      return signedIn;
+    }
+    final var job = command.getCurrentJob();
+    if ((job == null) || (job.getJobDefinitionId() == null)) {
+      return null;
+    }
+    final var jobDefinition = command.getJobDefinitionManager().findById(job.getJobDefinitionId());
+    if ((jobDefinition == null) || !Batch.TYPE_PROCESS_INSTANCE_UPDATE_SUSPENSION_STATE
+        .equals(jobDefinition.getJobType())) {
+      return null;
+    }
+    final var batch = command.getBatchManager().findBatchById(jobDefinition.getJobConfiguration());
+    return batch == null
+        ? null
+        : batch.getCreateUserId();
 
   }
 
