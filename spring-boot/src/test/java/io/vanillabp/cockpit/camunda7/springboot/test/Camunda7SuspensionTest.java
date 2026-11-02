@@ -12,7 +12,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.task.Task;
@@ -414,7 +413,7 @@ public class Camunda7SuspensionTest {
 
   /**
    * Runs the jobs of one job definition, next to the job executor. Whichever of the two takes a
-   * job first runs it. The other one finds it gone, which is no failure here.
+   * job first runs it. The other one finds it gone, or half gone, which is no failure here.
    */
   private void runTheJobsOf(
       final String jobDefinitionId) {
@@ -429,8 +428,13 @@ public class Camunda7SuspensionTest {
           .forEach(job -> {
             try {
               engine.getManagementService().executeJob(job.getId());
-            } catch (final ProcessEngineException e) {
-              // the job executor ran it first
+            } catch (final RuntimeException e) {
+              // The job executor ran it first. Depending on how far it got, Camunda throws a
+              // ProcessEngineException or a NullPointerException for the configuration it
+              // already deleted. Only a job which is still there failed for real.
+              if (engine.getManagementService().createJobQuery().jobId(job.getId()).count() > 0) {
+                throw e;
+              }
             }
           });
     }
