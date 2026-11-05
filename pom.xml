@@ -17,7 +17,7 @@
   <packaging>pom</packaging>
   <name>VanillaBP Business Cockpit adapter for Camunda 7</name>
   <description>Business Cockpit integration for Camunda 7, built as a VanillaBP 2 extension.</description>
-  <url>https://github.com/vanillabp/businesscockpit-camunda7-adapter</url>
+  <url>https://github.com/vanillabp/business-cockpit-camunda7-adapter</url>
 
   <modules>
     <module>core</module>
@@ -29,9 +29,9 @@
   </modules>
 
   <scm>
-    <connection>scm:git:https://github.com/vanillabp/businesscockpit-camunda7-adapter.git</connection>
-    <developerConnection>scm:git:https://github.com/vanillabp/businesscockpit-camunda7-adapter.git</developerConnection>
-    <url>https://github.com/vanillabp/businesscockpit-camunda7-adapter/tree/main</url>
+    <connection>scm:git:https://github.com/vanillabp/business-cockpit-camunda7-adapter.git</connection>
+    <developerConnection>scm:git:https://github.com/vanillabp/business-cockpit-camunda7-adapter.git</developerConnection>
+    <url>https://github.com/vanillabp/business-cockpit-camunda7-adapter/tree/main</url>
   </scm>
 
   <properties>
