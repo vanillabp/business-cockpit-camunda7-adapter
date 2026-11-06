@@ -46,7 +46,7 @@
       <artifactId>extensions-commons-quarkus-deployment</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.camunda.community.vanillabp</groupId>
+      <groupId>io.vanillabp</groupId>
       <artifactId>camunda7-adapter-quarkus-deployment</artifactId>
     </dependency>
 

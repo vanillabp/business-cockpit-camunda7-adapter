@@ -125,22 +125,22 @@
         <version>${business-cockpit.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.camunda.community.vanillabp</groupId>
+        <groupId>io.vanillabp</groupId>
         <artifactId>camunda7-adapter</artifactId>
         <version>${camunda7-adapter.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.camunda.community.vanillabp</groupId>
+        <groupId>io.vanillabp</groupId>
         <artifactId>camunda7-adapter-spring-boot</artifactId>
         <version>${camunda7-adapter.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.camunda.community.vanillabp</groupId>
+        <groupId>io.vanillabp</groupId>
         <artifactId>camunda7-adapter-quarkus</artifactId>
         <version>${camunda7-adapter.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.camunda.community.vanillabp</groupId>
+        <groupId>io.vanillabp</groupId>
         <artifactId>camunda7-adapter-quarkus-deployment</artifactId>
         <version>${camunda7-adapter.version}</version>
       </dependency>

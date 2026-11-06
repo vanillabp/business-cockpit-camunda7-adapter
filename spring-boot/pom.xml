@@ -41,7 +41,7 @@
     <dependency>
       <!-- the engines this extension listens to: they are held per configured adapter id by
         the adapter's Spring Boot module, which is the only place the extension takes them from -->
-      <groupId>org.camunda.community.vanillabp</groupId>
+      <groupId>io.vanillabp</groupId>
       <artifactId>camunda7-adapter-spring-boot</artifactId>
     </dependency>
     <dependency>

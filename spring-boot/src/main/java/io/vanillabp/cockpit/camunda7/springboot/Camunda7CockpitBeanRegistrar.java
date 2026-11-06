@@ -85,7 +85,7 @@ public class Camunda7CockpitBeanRegistrar implements BeanRegistrar {
                     The Business Cockpit found no Camunda 7 engine for the adapter '%s', \
                     although VanillaBP counts that id among the Camunda 7 adapters of this \
                     application. Add the artifact \
-                    'org.camunda.community.vanillabp:camunda7-adapter-spring-boot' to your workflow \
+                    'io.vanillabp:camunda7-adapter-spring-boot' to your workflow \
                     module: the cockpit listens to the engines that adapter builds and has none \
                     of its own."""
                     .formatted(adapterId)))
