@@ -293,7 +293,7 @@ public class Camunda7CockpitCustomizer implements Camunda7EngineCustomizer {
                             knows about the engine of the adapter '%s', although VanillaBP counts \
                             that id among the Camunda 7 adapters of this application. The adapter \
                             publishes one entry per configured adapter id and published: %s. Add \
-                            the artifact 'org.camunda.community.vanillabp:camunda7-adapter' of \
+                            the artifact 'io.vanillabp:camunda7-adapter' of \
                             your platform to your workflow module: the cockpit listens to the \
                             engines that adapter builds and has none of its own."""
                             .formatted(

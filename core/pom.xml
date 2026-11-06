@@ -42,7 +42,7 @@
       <!-- names the processing context this extension is wired with, and holds the engine
            customizer its listeners are installed through. It brings the Camunda engine and
            the VanillaBP SPI artifacts along. -->
-      <groupId>org.camunda.community.vanillabp</groupId>
+      <groupId>io.vanillabp</groupId>
       <artifactId>camunda7-adapter</artifactId>
     </dependency>
     <dependency>

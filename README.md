@@ -114,14 +114,9 @@ each with an embedded Camunda 7 engine on H2, a cockpit server the test runs its
 in between. No BPMS double and no mock of the engine, because what is under test is exactly the
 part which touches the engine.
 
-The build reads the snapshots of the platform and of the cockpit from the snapshot repository of
-Maven Central, `https://central.sonatype.com/repository/maven-snapshots/`. The parent
-`io.vanillabp:release-parent` names that repository, and reading it needs no login. The snapshot of
-the Camunda 7 adapter is the exception. Its namespace belongs to the Camunda Community Hub, so it is
-published to `https://maven.pkg.github.com/camunda-community-hub/vanillabp-camunda7-adapter`.
-GitHub Packages asks for a token even for a public package. A local build needs that repository in
-`~/.m2/settings.xml`, with a GitHub token which has the scope `read:packages`. CI reads it through
-[.github/workflows/github-packages-settings.xml](./.github/workflows/github-packages-settings.xml).
+The build reads the snapshots of the platform, of the cockpit and of the Camunda 7 adapter from the
+snapshot repository of Maven Central, `https://central.sonatype.com/repository/maven-snapshots/`.
+The parent `io.vanillabp:release-parent` names that repository, and reading it needs no login.
 
 Snapshots of this repository go to the snapshot repository of Maven Central through the pipeline
 described below, and releases go to Maven Central under the groupId `io.vanillabp.businesscockpit`,

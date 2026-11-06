@@ -42,7 +42,7 @@
     <dependency>
       <!-- the engines this extension listens to, held per configured adapter id by the
         adapter's own Quarkus extension -->
-      <groupId>org.camunda.community.vanillabp</groupId>
+      <groupId>io.vanillabp</groupId>
       <artifactId>camunda7-adapter-quarkus</artifactId>
     </dependency>
     <dependency>
