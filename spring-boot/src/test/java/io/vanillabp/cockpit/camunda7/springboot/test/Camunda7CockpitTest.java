@@ -357,6 +357,67 @@ public class Camunda7CockpitTest {
     // the end of a case says nothing about its start. The engine writes the start time only into
     // the event of the start, and this end comes in a command of its own
     assertTrue(workflow.body().contains("\"createdAt\":null"), workflow.body());
+    // the reason of the deletion is the comment of both, because no details provider set one
+    assertTrue(task.body().contains("\"comment\":\"the test cancelled it\""), task.body());
+    assertTrue(workflow.body().contains("\"comment\":\"the test cancelled it\""), workflow.body());
+
+  }
+
+  @Test
+  @DisplayName("A comment the details providers set wins over the reason of the deletion")
+  public void theCommentOfTheModuleWinsOverTheDeleteReason() {
+
+    final var aggregate = aStartedWorkflow(TestWorkflowService.CUSTOMER_WITH_A_COMMENT);
+    final var userTaskId = userTaskIdOf(aggregate);
+    CockpitServer.awaitRequestOf("/usertask/created", reportsOf(aggregate));
+
+    final var workflowId = workflowIdOf(aggregate);
+    engine.getRuntimeService().deleteProcessInstance(workflowId, "an operator deleted it");
+
+    final var task = CockpitServer.awaitAnyRequest("/usertask/%s/cancelled".formatted(userTaskId));
+    final var workflow = CockpitServer.awaitAnyRequest("/workflow/%s/cancelled".formatted(workflowId));
+    final var ofTheModule = "\"comment\":\"%s\"".formatted(TestWorkflowService.COMMENT_OF_THE_MODULE);
+    assertTrue(task.body().contains(ofTheModule), task.body());
+    assertTrue(workflow.body().contains(ofTheModule), workflow.body());
+    assertFalse(task.body().contains("an operator deleted it"), task.body());
+    assertFalse(workflow.body().contains("an operator deleted it"), workflow.body());
+
+  }
+
+  @Test
+  @DisplayName("A deletion without a reason leaves the comment empty")
+  public void aDeletionWithoutAReasonLeavesTheCommentEmpty() {
+
+    final var aggregate = aStartedWorkflow("Nora");
+    final var userTaskId = userTaskIdOf(aggregate);
+    CockpitServer.awaitRequestOf("/usertask/created", reportsOf(aggregate));
+
+    final var workflowId = workflowIdOf(aggregate);
+    engine.getRuntimeService().deleteProcessInstance(workflowId, null);
+
+    // the engine gives the task the delete reason 'deleted' here, a word of its own
+    final var task = CockpitServer.awaitAnyRequest("/usertask/%s/cancelled".formatted(userTaskId));
+    assertTrue(task.body().contains("\"comment\":null"), task.body());
+    assertFalse(task.body().contains("\"comment\":\"deleted\""), task.body());
+
+  }
+
+  @Test
+  @DisplayName("A task a boundary event takes away carries no comment, the engine's words are no reason")
+  public void aModelledWayOutLeavesTheCommentEmpty() {
+
+    final var aggregate = aStartedWorkflow("Paul");
+    final var userTaskId = userTaskIdOf(aggregate);
+    CockpitServer.awaitRequestOf("/usertask/created", reportsOf(aggregate));
+
+    final var workflowId = workflowIdOf(aggregate);
+    engine.getRuntimeService().createMessageCorrelation("Withdrawn").processInstanceId(workflowId).correlate();
+
+    final var task = CockpitServer.awaitAnyRequest("/usertask/%s/cancelled".formatted(userTaskId));
+    assertTrue(task.body().contains("\"comment\":null"), task.body());
+    // the modelled way out is a normal end of the case
+    final var workflow = CockpitServer.awaitAnyRequest("/workflow/%s/completed".formatted(workflowId));
+    assertTrue(workflow.body().contains("\"comment\":null"), workflow.body());
 
   }
 
