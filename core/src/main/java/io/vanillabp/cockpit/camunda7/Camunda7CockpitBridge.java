@@ -17,7 +17,6 @@ import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
-import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.task.IdentityLink;
@@ -388,8 +387,8 @@ public class Camunda7CockpitBridge implements BusinessCockpitBpmsBridge {
   }
 
   /**
-   * The reason somebody gave while cancelling the process instance of a task. Only the deletion
-   * of a task carries one. See {@link Camunda7DeleteReasons} for which reasons count.
+   * The reason somebody gave while deleting the process instance of a task. Only the deletion of
+   * a task carries one. See {@link Camunda7Deletions} for when it counts.
    */
   private static String commentOfTheEvent(
       final DelegateTask task) {
@@ -397,22 +396,18 @@ public class Camunda7CockpitBridge implements BusinessCockpitBpmsBridge {
     if (!TaskListener.EVENTNAME_DELETE.equals(task.getEventName())) {
       return null;
     }
-    return Camunda7DeleteReasons.writtenByAPerson(task.getDeleteReason());
+    return Camunda7Deletions.commentOfADeletedTask(task.getDeleteReason());
 
   }
 
   /**
-   * The reason somebody gave while cancelling a process instance. Only the end of an instance
-   * carries one, and only where something ended it from the outside. See
-   * {@link Camunda7DeleteReasons} for which reasons count.
+   * The reason somebody gave while deleting a process instance. See {@link Camunda7Deletions}
+   * for when it counts.
    */
   private static String commentOfTheEvent(
       final HistoricProcessInstanceEventEntity event) {
 
-    if (!event.isEventOfType(HistoryEventTypes.PROCESS_INSTANCE_END)) {
-      return null;
-    }
-    return Camunda7DeleteReasons.writtenByAPerson(event.getDeleteReason());
+    return Camunda7Deletions.commentOf(event);
 
   }
 

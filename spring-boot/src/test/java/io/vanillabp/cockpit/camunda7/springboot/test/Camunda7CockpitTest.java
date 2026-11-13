@@ -385,7 +385,7 @@ public class Camunda7CockpitTest {
   }
 
   @Test
-  @DisplayName("A deletion without a reason leaves the comment empty")
+  @DisplayName("A deletion without a reason cancels the task and the workflow and leaves the comment empty")
   public void aDeletionWithoutAReasonLeavesTheCommentEmpty() {
 
     final var aggregate = aStartedWorkflow("Nora");
@@ -395,10 +395,88 @@ public class Camunda7CockpitTest {
     final var workflowId = workflowIdOf(aggregate);
     engine.getRuntimeService().deleteProcessInstance(workflowId, null);
 
-    // the engine gives the task the delete reason 'deleted' here, a word of its own
+    // the engine gives the task the delete reason 'deleted' here, its stand-in for "none"
     final var task = CockpitServer.awaitAnyRequest("/usertask/%s/cancelled".formatted(userTaskId));
     assertTrue(task.body().contains("\"comment\":null"), task.body());
-    assertFalse(task.body().contains("\"comment\":\"deleted\""), task.body());
+    // the engine writes no delete reason for the instance, and it is cancelled all the same
+    final var workflow = CockpitServer.awaitAnyRequest("/workflow/%s/cancelled".formatted(workflowId));
+    assertTrue(workflow.body().contains("\"comment\":null"), workflow.body());
+
+  }
+
+  @Test
+  @DisplayName("A batch which deletes instances hands the reason to the task and the workflow")
+  public void aBatchDeletionHandsOnTheReason() {
+
+    final var aggregate = aStartedWorkflow("Rita");
+    final var userTaskId = userTaskIdOf(aggregate);
+    CockpitServer.awaitRequestOf("/usertask/created", reportsOf(aggregate));
+
+    final var workflowId = workflowIdOf(aggregate);
+    final var batch = engine
+        .getRuntimeService()
+        .deleteProcessInstancesAsync(List.of(workflowId), "an operator deleted a batch");
+    runTheJobsOf(batch.getSeedJobDefinitionId());
+    runTheJobsOf(batch.getBatchJobDefinitionId());
+
+    final var task = CockpitServer.awaitAnyRequest("/usertask/%s/cancelled".formatted(userTaskId));
+    assertTrue(task.body().contains("\"comment\":\"an operator deleted a batch\""), task.body());
+    final var workflow = CockpitServer.awaitAnyRequest("/workflow/%s/cancelled".formatted(workflowId));
+    assertTrue(workflow.body().contains("\"comment\":\"an operator deleted a batch\""), workflow.body());
+
+  }
+
+  @Test
+  @DisplayName("A modification which cancels the only task cancels the workflow, but it is no deletion and gives no comment")
+  public void aModificationIsNoDeletion() {
+
+    final var aggregate = aStartedWorkflow("Sven");
+    final var userTaskId = userTaskIdOf(aggregate);
+    CockpitServer.awaitRequestOf("/usertask/created", reportsOf(aggregate));
+
+    final var workflowId = workflowIdOf(aggregate);
+    engine
+        .getRuntimeService()
+        .createProcessInstanceModification(workflowId)
+        .cancelAllForActivity(TestWorkflowService.BPMN_TASK_ID)
+        .execute();
+
+    final var task = CockpitServer.awaitAnyRequest("/usertask/%s/cancelled".formatted(userTaskId));
+    assertTrue(task.body().contains("\"comment\":null"), task.body());
+    // nothing is left to run, so the engine tears the instance down: it did not reach an end event
+    final var workflow = CockpitServer.awaitAnyRequest("/workflow/%s/cancelled".formatted(workflowId));
+    assertTrue(workflow.body().contains("\"comment\":null"), workflow.body());
+
+  }
+
+  /**
+   * Runs the jobs of one job definition, next to the job executor. Whichever of the two takes a
+   * job first runs it. The other one finds it gone, half gone or still busy, which is no failure
+   * here.
+   */
+  private void runTheJobsOf(
+      final String jobDefinitionId) {
+
+    final var deadline = System.currentTimeMillis() + 30000;
+    while (System.currentTimeMillis() < deadline) {
+      final var jobs = engine.getManagementService().createJobQuery().jobDefinitionId(jobDefinitionId).list();
+      if (jobs.isEmpty()) {
+        return;
+      }
+      jobs
+          .forEach(job -> {
+            try {
+              engine.getManagementService().executeJob(job.getId());
+            } catch (final RuntimeException e) {
+              // The job executor ran it first, or at the same moment. Only a job which is still
+              // there failed for real, and the next round looks at it again.
+              if (engine.getManagementService().createJobQuery().jobId(job.getId()).count() == 0) {
+                return;
+              }
+            }
+          });
+    }
+    throw new AssertionError("The jobs of the job definition %s did not run".formatted(jobDefinitionId));
 
   }
 
