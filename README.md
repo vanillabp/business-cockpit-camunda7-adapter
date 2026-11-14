@@ -89,7 +89,10 @@ application whose aggregates live in two persistences therefore needs nothing ex
 And it has no configuration key of its own. What this half has to know about an engine it asks the
 Camunda 7 adapter: the tenant a workflow module was deployed under, and whether the outbox entry
 can share the engine's transaction. The adapter acts on both answers itself, so the extension
-cannot disagree with the engine it listens to.
+cannot disagree with the engine it listens to. Because this half announces no key to
+`extensions-commons` (`AdapterCockpitKeys`), the cockpit's neutral half refuses every key at
+`vanillabp.adapters.<adapter-id>.cockpit` and below. `Camunda7KeyAtTheAdapterRefusedTest` holds that
+on both platforms.
 
 So the Spring Boot jar ships no configuration metadata, the file an IDE reads to offer the keys in
 `application.yaml`. The keys an application writes for the cockpit come from two other jars. The
