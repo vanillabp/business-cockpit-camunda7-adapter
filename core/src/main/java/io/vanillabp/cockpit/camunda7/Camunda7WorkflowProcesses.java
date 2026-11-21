@@ -40,6 +40,10 @@ public class Camunda7WorkflowProcesses {
   /**
    * The core which wired the processes, which answers whether two of them share a workflow
    * aggregate. Set by the wiring service, which is the one bean holding both.
+   * <p>
+   * This is the one type of the adapter SPI the extension still names. The narrow
+   * <code>WorkflowTaskClaims</code> of the integration SPI does not offer
+   * <code>workflowsShareTheWorkflowAggregate</code> yet. Once it does, this field takes that type.
    */
   private volatile WorkflowTaskWiring core;
 

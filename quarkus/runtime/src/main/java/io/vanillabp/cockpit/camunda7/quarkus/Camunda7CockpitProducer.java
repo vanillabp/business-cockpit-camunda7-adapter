@@ -15,10 +15,10 @@ import io.vanillabp.cockpit.camunda7.Camunda7CockpitWiring;
 import io.vanillabp.cockpit.camunda7.Camunda7WorkflowProcesses;
 import io.vanillabp.cockpit.extension.spi.BusinessCockpitBpmsBridge;
 import io.vanillabp.cockpit.extension.spi.BusinessCockpitEventPublisher;
-import io.vanillabp.integration.adapter.migration.config.MigrationAdapterProperties;
-import io.vanillabp.integration.adapter.spi.NameClashAvoidanceSupport;
 import io.vanillabp.integration.adapter.spi.workflowtask.WorkflowTaskWiring;
 import io.vanillabp.integration.extension.spi.ExtensionWiringService;
+import io.vanillabp.integration.extension.spi.settings.VanillaBpSettings;
+import io.vanillabp.integration.spi.IdentifierScoping;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Instance;
 import jakarta.enterprise.inject.Produces;
@@ -100,7 +100,7 @@ public class Camunda7CockpitProducer {
   @Unremovable
   public Camunda7CockpitCustomizer businessCockpitCamunda7EngineCustomizer(
       final Camunda7WorkflowProcesses processes,
-      final NameClashAvoidanceSupport scoping,
+      final IdentifierScoping scoping,
       final Instance<List<Camunda7EngineFacts>> engines,
       final Instance<BusinessCockpitEventPublisher> publisher) {
 
@@ -117,7 +117,7 @@ public class Camunda7CockpitProducer {
     * collects both shapes, the same way VanillaBP's own Quarkus integration collects the adapter
     * deployment services of a BPMS adapter.
    * <p>
-    * WHICH adapter ids those are is {@code MigrationAdapterProperties#adapterIdsOfType}, the same
+    * WHICH adapter ids those are is {@code VanillaBpSettings#adapterIdsOfType}, the same
     * answer the Spring Boot half reads through the platform's registrar support. Filtering the
     * configured types is not that answer. An id named in <code>prioritized-adapters</code> needs
     * no section of its own, and an application which configured nothing at all has the id the
@@ -135,7 +135,7 @@ public class Camunda7CockpitProducer {
   @Singleton
   @Unremovable
   public List<BusinessCockpitBpmsBridge> businessCockpitCamunda7Bridges(
-      final MigrationAdapterProperties properties,
+      final VanillaBpSettings properties,
       final Camunda7QuarkusEngineRegistry engines,
       final Camunda7CockpitCustomizer customizer,
       final Camunda7WorkflowProcesses processes) {

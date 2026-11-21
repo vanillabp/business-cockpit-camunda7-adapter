@@ -14,10 +14,10 @@ import io.vanillabp.cockpit.camunda7.Camunda7CockpitCustomizer;
 import io.vanillabp.cockpit.camunda7.Camunda7CockpitWiring;
 import io.vanillabp.cockpit.camunda7.Camunda7WorkflowProcesses;
 import io.vanillabp.cockpit.extension.spi.BusinessCockpitEventPublisher;
-import io.vanillabp.integration.adapter.migration.config.MigrationAdapterProperties;
-import io.vanillabp.integration.adapter.spi.NameClashAvoidanceSupport;
 import io.vanillabp.integration.adapter.spi.workflowtask.WorkflowTaskWiring;
 import io.vanillabp.integration.extension.spi.ExtensionWiringService;
+import io.vanillabp.integration.extension.spi.settings.VanillaBpSettings;
+import io.vanillabp.integration.spi.IdentifierScoping;
 
 /**
  * Registers the Camunda 7 half of the Business Cockpit extension on Spring Boot.
@@ -30,7 +30,7 @@ import io.vanillabp.integration.extension.spi.ExtensionWiringService;
  * extension does not compile against a platform integration.
  */
 @AutoConfiguration(afterName = "io.vanillabp.integration.processservice.SpringBootMigrationAdapterAutoConfiguration")
-@ConditionalOnBean(MigrationAdapterProperties.class)
+@ConditionalOnBean(VanillaBpSettings.class)
 @Import(Camunda7CockpitBeanRegistrar.class)
 public class Camunda7CockpitAutoConfiguration {
 
@@ -97,7 +97,7 @@ public class Camunda7CockpitAutoConfiguration {
   @Bean
   public Camunda7CockpitCustomizer businessCockpitCamunda7EngineCustomizer(
       final Camunda7WorkflowProcesses processes,
-      final NameClashAvoidanceSupport scoping,
+      final IdentifierScoping scoping,
       final ObjectProvider<Camunda7EngineFacts> engines,
       final ObjectProvider<BusinessCockpitEventPublisher> publisher) {
 

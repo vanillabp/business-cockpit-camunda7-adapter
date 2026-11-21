@@ -13,9 +13,9 @@ import io.vanillabp.camunda7.Camunda7ProcessingContext;
 import io.vanillabp.camunda7.api.Camunda7TaskDefinitions;
 import io.vanillabp.cockpit.extension.spi.BusinessCockpitEventPublisher;
 import io.vanillabp.cockpit.extension.wiring.BusinessCockpitWiringService;
-import io.vanillabp.integration.adapter.spi.NameClashAvoidanceSupport;
 import io.vanillabp.integration.adapter.spi.workflowtask.WorkflowTaskWiring;
 import io.vanillabp.integration.extension.spi.ExtensionWiringService;
+import io.vanillabp.integration.spi.IdentifierScoping;
 
 /**
  * The Camunda 7 half of the Business Cockpit in VanillaBP's deployment pipeline.
@@ -152,7 +152,7 @@ public class Camunda7CockpitWiring implements ExtensionWiringService<BpmnModelIn
     if (model == null) {
       return null;
     }
-    final var scopedSuffix = NameClashAvoidanceSupport.SEPARATOR + bpmnProcessId;
+    final var scopedSuffix = IdentifierScoping.SEPARATOR + bpmnProcessId;
     return model
         .getModelElementsByType(Process.class)
         .stream()
