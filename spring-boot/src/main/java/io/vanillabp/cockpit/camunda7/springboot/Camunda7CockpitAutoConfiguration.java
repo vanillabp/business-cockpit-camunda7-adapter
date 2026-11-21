@@ -14,10 +14,10 @@ import io.vanillabp.cockpit.camunda7.Camunda7CockpitCustomizer;
 import io.vanillabp.cockpit.camunda7.Camunda7CockpitWiring;
 import io.vanillabp.cockpit.camunda7.Camunda7WorkflowProcesses;
 import io.vanillabp.cockpit.extension.spi.BusinessCockpitEventPublisher;
-import io.vanillabp.integration.adapter.migration.config.MigrationAdapterProperties;
-import io.vanillabp.integration.adapter.spi.NameClashAvoidanceSupport;
-import io.vanillabp.integration.adapter.spi.workflowtask.WorkflowTaskWiring;
 import io.vanillabp.integration.extension.spi.ExtensionWiringService;
+import io.vanillabp.integration.extension.spi.settings.VanillaBpSettings;
+import io.vanillabp.integration.spi.IdentifierScoping;
+import io.vanillabp.integration.spi.workflowtask.WorkflowTaskClaims;
 
 /**
  * Registers the Camunda 7 half of the Business Cockpit extension on Spring Boot.
@@ -30,7 +30,7 @@ import io.vanillabp.integration.extension.spi.ExtensionWiringService;
  * extension does not compile against a platform integration.
  */
 @AutoConfiguration(afterName = "io.vanillabp.integration.processservice.SpringBootMigrationAdapterAutoConfiguration")
-@ConditionalOnBean(MigrationAdapterProperties.class)
+@ConditionalOnBean(VanillaBpSettings.class)
 @Import(Camunda7CockpitBeanRegistrar.class)
 public class Camunda7CockpitAutoConfiguration {
 
@@ -60,7 +60,7 @@ public class Camunda7CockpitAutoConfiguration {
    * Provides this extension's wiring service.
    *
    * @param processes The claimed processes
-   * @param workflowTaskWiring VanillaBP's registry, which answers whether a
+   * @param workflowTaskClaims VanillaBP's registry, which answers whether a
    *          <code>&#64;WorkflowService</code> claims a process
    * @param publisher The extension, which is told the user tasks of every wired model. It is
    *          resolved when the first model is wired
@@ -70,10 +70,10 @@ public class Camunda7CockpitAutoConfiguration {
   @Bean
   public ExtensionWiringService<BpmnModelInstance, Camunda7ProcessingContext> businessCockpitCamunda7WiringService(
       final Camunda7WorkflowProcesses processes,
-      final WorkflowTaskWiring workflowTaskWiring,
+      final WorkflowTaskClaims workflowTaskClaims,
       final ObjectProvider<BusinessCockpitEventPublisher> publisher) {
 
-    return new Camunda7CockpitWiring(processes, workflowTaskWiring, publisher::getObject);
+    return new Camunda7CockpitWiring(processes, workflowTaskClaims, publisher::getObject);
 
   }
 
@@ -97,7 +97,7 @@ public class Camunda7CockpitAutoConfiguration {
   @Bean
   public Camunda7CockpitCustomizer businessCockpitCamunda7EngineCustomizer(
       final Camunda7WorkflowProcesses processes,
-      final NameClashAvoidanceSupport scoping,
+      final IdentifierScoping scoping,
       final ObjectProvider<Camunda7EngineFacts> engines,
       final ObjectProvider<BusinessCockpitEventPublisher> publisher) {
 

@@ -3,7 +3,7 @@ package io.vanillabp.cockpit.camunda7;
 import java.util.function.Supplier;
 
 import io.vanillabp.camunda7.api.Camunda7EngineFacts;
-import io.vanillabp.integration.adapter.spi.NameClashAvoidanceSupport;
+import io.vanillabp.integration.spi.IdentifierScoping;
 
 /**
  * How one configured Camunda 7 engine names the things the extension asks it about.
@@ -31,7 +31,7 @@ public final class Camunda7Scope {
 
   private final String adapterId;
 
-  private final NameClashAvoidanceSupport scoping;
+  private final IdentifierScoping scoping;
 
   private final Supplier<Camunda7EngineFacts> engine;
 
@@ -44,7 +44,7 @@ public final class Camunda7Scope {
    */
   public Camunda7Scope(
       final String adapterId,
-      final NameClashAvoidanceSupport scoping,
+      final IdentifierScoping scoping,
       final Supplier<Camunda7EngineFacts> engine) {
 
     this.adapterId = adapterId;
@@ -121,7 +121,7 @@ public final class Camunda7Scope {
       final String workflowModuleId,
       final String bpmnProcessId) {
 
-    return NameClashAvoidanceSupport
+    return IdentifierScoping
         .scopedProcessId(scoping, workflowModuleId, bpmnProcessId, adapterId);
 
   }

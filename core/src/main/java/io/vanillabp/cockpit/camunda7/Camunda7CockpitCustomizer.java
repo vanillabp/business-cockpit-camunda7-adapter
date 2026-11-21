@@ -19,7 +19,7 @@ import io.vanillabp.camunda7.api.Camunda7EngineFacts;
 import io.vanillabp.camunda7.engine.Camunda7EngineCustomizer;
 import io.vanillabp.cockpit.extension.spi.BusinessCockpitEventPublisher;
 import io.vanillabp.cockpit.extension.spi.EventTransaction;
-import io.vanillabp.integration.adapter.spi.NameClashAvoidanceSupport;
+import io.vanillabp.integration.spi.IdentifierScoping;
 
 /**
  * What the Business Cockpit adds to every Camunda 7 engine VanillaBP builds.
@@ -58,7 +58,7 @@ public class Camunda7CockpitCustomizer implements Camunda7EngineCustomizer {
 
   private final Camunda7WorkflowProcesses processes;
 
-  private final NameClashAvoidanceSupport scoping;
+  private final IdentifierScoping scoping;
 
   private final Supplier<List<Camunda7EngineFacts>> engines;
 
@@ -88,7 +88,7 @@ public class Camunda7CockpitCustomizer implements Camunda7EngineCustomizer {
    */
   public Camunda7CockpitCustomizer(
       final Camunda7WorkflowProcesses processes,
-      final NameClashAvoidanceSupport scoping,
+      final IdentifierScoping scoping,
       final Supplier<List<Camunda7EngineFacts>> engines,
       final Supplier<BusinessCockpitEventPublisher> publisher) {
 
