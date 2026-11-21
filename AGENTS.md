@@ -34,12 +34,11 @@ of the platform repository.
 
 What the extension reads from VanillaBP comes from the extension SPI and the integration SPI:
 `VanillaBpSettings` for the configured adapters, `IdentifierScoping` for how an engine spells an id,
-and `MultiInstanceIteration` for a multi-instance element. The core of VanillaBP
+`WorkflowTaskClaims` for what the application declared, and `MultiInstanceIteration` for a
+multi-instance element. The core of VanillaBP
 (`migration-adapter`), the adapter SPI and the platform integrations are test dependencies only. An
 enforcer rule in the root `pom.xml` stops the build when a module declares one of them in another
-scope. Two declarations are left on purpose, and each POM says why: the core module names
-`WorkflowTaskWiring` of the adapter SPI, because `WorkflowTaskClaims` of the integration SPI does
-not offer `workflowsShareTheWorkflowAggregate` yet (decision 3), and the Spring Boot module calls
+scope. One declaration is left on purpose, and its POM says why: the Spring Boot module calls
 `AdapterBeanRegistrarSupport` of the Spring Boot integration. The rule checks only what a module
 declares. The Camunda 7 adapter brings the adapter SPI and its platform integration along, and that
 is its right as a BPMS adapter.

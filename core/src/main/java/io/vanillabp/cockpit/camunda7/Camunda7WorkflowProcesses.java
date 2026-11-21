@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import io.vanillabp.integration.adapter.spi.workflowtask.WorkflowTaskWiring;
+import io.vanillabp.integration.spi.workflowtask.WorkflowTaskClaims;
 
 /**
  * Which BPMN processes of which workflow modules this application deployed and claims, and how
@@ -40,12 +40,8 @@ public class Camunda7WorkflowProcesses {
   /**
    * The core which wired the processes, which answers whether two of them share a workflow
    * aggregate. Set by the wiring service, which is the one bean holding both.
-   * <p>
-   * This is the one type of the adapter SPI the extension still names. The narrow
-   * <code>WorkflowTaskClaims</code> of the integration SPI does not offer
-   * <code>workflowsShareTheWorkflowAggregate</code> yet. Once it does, this field takes that type.
    */
-  private volatile WorkflowTaskWiring core;
+  private volatile WorkflowTaskClaims core;
 
   /**
    * Remembers the core which answers whether two processes share a workflow aggregate.
@@ -53,7 +49,7 @@ public class Camunda7WorkflowProcesses {
    * @param core VanillaBP's registry of what the application declared
    */
   public void rememberTheCore(
-      final WorkflowTaskWiring core) {
+      final WorkflowTaskClaims core) {
 
     this.core = core;
 
@@ -61,7 +57,7 @@ public class Camunda7WorkflowProcesses {
 
   /**
    * Whether a called process works on the workflow aggregate of the process which called it.
-   * The core answers it (<code>WorkflowTaskWiring#workflowsShareTheWorkflowAggregate</code>), the
+   * The core answers it (<code>WorkflowTaskClaims#workflowsShareTheWorkflowAggregate</code>), the
    * same answer the Camunda 7 adapter uses for its call activities. Nothing is decided here. See
    * decision 3 in the repository's DECISIONS.md.
    *

@@ -15,10 +15,10 @@ import io.vanillabp.cockpit.camunda7.Camunda7CockpitWiring;
 import io.vanillabp.cockpit.camunda7.Camunda7WorkflowProcesses;
 import io.vanillabp.cockpit.extension.spi.BusinessCockpitBpmsBridge;
 import io.vanillabp.cockpit.extension.spi.BusinessCockpitEventPublisher;
-import io.vanillabp.integration.adapter.spi.workflowtask.WorkflowTaskWiring;
 import io.vanillabp.integration.extension.spi.ExtensionWiringService;
 import io.vanillabp.integration.extension.spi.settings.VanillaBpSettings;
 import io.vanillabp.integration.spi.IdentifierScoping;
+import io.vanillabp.integration.spi.workflowtask.WorkflowTaskClaims;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Instance;
 import jakarta.enterprise.inject.Produces;
@@ -63,7 +63,7 @@ public class Camunda7CockpitProducer {
    * Produces this extension's wiring service.
    *
    * @param processes The claimed processes
-   * @param workflowTaskWiring VanillaBP's registry, which answers whether a
+   * @param workflowTaskClaims VanillaBP's registry, which answers whether a
    *          <code>&#64;WorkflowService</code> claims a process
    * @param publisher The extension, which is told the user tasks of every wired model. It is
    *          resolved when the first model is wired
@@ -75,10 +75,10 @@ public class Camunda7CockpitProducer {
   @Unremovable
   public ExtensionWiringService<BpmnModelInstance, Camunda7ProcessingContext> businessCockpitCamunda7WiringService(
       final Camunda7WorkflowProcesses processes,
-      final WorkflowTaskWiring workflowTaskWiring,
+      final WorkflowTaskClaims workflowTaskClaims,
       final Instance<BusinessCockpitEventPublisher> publisher) {
 
-    return new Camunda7CockpitWiring(processes, workflowTaskWiring, publisher::get);
+    return new Camunda7CockpitWiring(processes, workflowTaskClaims, publisher::get);
 
   }
 
